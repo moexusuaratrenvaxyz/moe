@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ATRENVA⛏️</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- Rewarded-ad SDK is injected dynamically in app.js from settings/adSdk (admin-configurable zone id) -->
+
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="loading-overlay" class="loading-overlay hidden">
+  <div class="spinner"></div><p>Loading...</p>
+</div>
+
+<div id="toast" class="toast hidden">
+  <span id="toast-icon"></span><span id="toast-message">Success!</span>
+</div>
+
+<header class="top-bar" id="top-bar">
+  <div class="top-bar-left">
+
+    <div class="app-logo-wrap" id="app-logo-wrap">
+      <div class="avatar-skeleton"></div>
+      <img id="app-user-avatar" class="app-user-avatar" alt="">
+      <span class="app-logo" id="app-logo-fallback">◈</span>
+    </div>
+    <span class="app-name name-loading" id="app-name">ATRENVA</span>
+    <span class="plan-badge-icon hidden" id="app-name-badge"></span>
+  </div>
+  <div class="top-bar-right">
+    <button class="top-btn" id="btn-notifications" onclick="openNotifications()" title="Notifications">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+      <span class="badge" id="notif-badge">0</span>
+    </button>
+  </div>
+</header>
+
+<main class="main-content" id="main-content">
+
+
+  <section id="screen-home" class="screen active">
+    <div class="balance-card card-3d">
+      <div class="balance-card-bg"></div>
+      <div class="balance-card-content">
+        <div class="balance-label">Total Balance</div>
+        <div class="balance-amount" id="home-balance">0.00</div>
+        <div class="balance-change" id="balance-change"><span>↗</span> +$0.00 today</div>
+        <div class="balance-actions">
+          <button class="balance-btn btn-deposit" onclick="openDeposit()"><span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span> Deposit</button>
+          <button class="balance-btn btn-withdraw" onclick="openWithdraw()"><span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span> Withdraw</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></div><div class="stat-value" id="stat-total-claim">0</div><div class="stat-label">Total Claim</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg></div><div class="stat-value" id="stat-invalid-work">0</div><div class="stat-label">Invalid Work</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7.5 7.5 0 1 1-15 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg></div><div class="stat-value" id="streak-count">0</div><div class="stat-label">Day Streak</div></div>
+      <div class="stat-card"><div class="stat-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"></path><path d="M7 14v5a2 2 0 0 0 2 2h1v-6"></path></svg></div><div class="stat-value" id="ad-campaign-count">0</div><div class="stat-label">Ad Campaigns</div></div>
+    </div>
+
+    <div class="plan-card">
+      <div class="plan-header">
+        <div class="plan-title"><span class="plan-icon" id="plan-icon"></span> Current Plan</div>
+        <span class="plan-badge" id="plan-badge">FREE</span>
+      </div>
+      <div class="plan-details">
+        <div class="plan-info">
+          <span>Expires in <strong id="plan-days">--</strong> days</span>
+          <span class="plan-upgrade" onclick="openPlans()">Upgrade →</span>
+        </div>
+        <div class="plan-progress"><div class="plan-progress-bar" id="plan-progress-bar"></div></div>
+        <div class="plan-features-mini" id="plan-features"></div>
+      </div>
+    </div>
+
+    <div class="section-title">Earning Methods</div>
+    <div class="earn-grid">
+      <button class="earn-btn" onclick="openTaskCenter('task')">
+        <span class="earn-btn-icon" style="background:#EDEBFF;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="9" y1="12" x2="15" y2="12"></line><line x1="9" y1="16" x2="15" y2="16"></line></svg></span>
+        <span class="earn-btn-label">Task</span>
+      </button>
+      <button class="earn-btn" onclick="openGmailCenter()">
+        <span class="earn-btn-icon" style="background:#E2F0FF;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M22 6l-10 7L2 6"></path></svg></span>
+        <span class="earn-btn-label">Gmail</span>
+      </button>
+      <button class="earn-btn" onclick="openFacebookCenter()">
+        <span class="earn-btn-icon" style="background:#E2ECFF;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg></span>
+        <span class="earn-btn-label">Facebook</span>
+      </button>
+      <button class="earn-btn" onclick="openMining()">
+        <span class="earn-btn-icon" style="background:#DFF6EE;">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 8h16l-2 8H6z"></path>
+            <path d="M4 8V5h16v3"></path>
+            <circle cx="8" cy="19" r="1.5"></circle>
+            <circle cx="16" cy="19" r="1.5"></circle>
+          </svg>
+        </span>
+        <span class="earn-btn-label">Mining</span>
+      </button>
+      <button class="earn-btn" onclick="openWatchAd()">
+        <span class="earn-btn-icon" style="background:#FFEAEA;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg></span>
+        <span class="earn-btn-label">Watch Ad</span>
+      </button>
+      <button class="earn-btn" onclick="openStoneHunt()">
+        <span class="earn-btn-icon" style="background:#DFF6EE;">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3h12l4 6-10 12L2 9z"></path>
+            <path d="M11 3l-3 6 4 13 4-13-3-6"></path>
+            <path d="M2 9h20"></path>
+          </svg>
+        </span>
+        <span class="earn-btn-label">Stone Hunt</span>
+      </button>
+      <button class="earn-btn" onclick="openEvents()">
+        <span class="earn-btn-icon" style="background:#FFF1D6;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+        <span class="earn-btn-label">Events</span>
+      </button>
+      <button class="earn-btn" onclick="openExchange()">
+        <span class="earn-btn-icon" style="background:#E6F7F3;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg></span>
+        <span class="earn-btn-label">Exchange</span>
+      </button>
+      <button class="earn-btn" onclick="openGift()">
+        <span class="earn-btn-icon" style="background:#FDE7F0;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M12 8c-1.5-3-5-4-6-2s1 3 6 2zM12 8c1.5-3 5-4 6-2s-1 3-6 2z"></path></svg></span>
+        <span class="earn-btn-label">Gift</span>
+      </button>
+    </div>
+
+    <div class="section-title">Top Earners</div>
+    <div class="leaderboard-card">
+      <div class="leaderboard-list" id="leaderboard-preview"></div>
+    </div>
+
+    <div class="daily-bonus-card" id="daily-bonus-card">
+      <div class="daily-bonus-left">
+        <div class="daily-bonus-title"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M12 8c-1.5-3-5-4-6-2s1 3 6 2zM12 8c1.5-3 5-4 6-2s-1 3-6 2z"></path></svg> Daily Bonus</div>
+        <div class="daily-bonus-desc" id="daily-bonus-desc">Claim your free reward today!</div>
+      </div>
+      <button class="daily-bonus-btn" id="claim-bonus-btn" onclick="claimDailyBonus()">Claim</button>
+    </div>
+
+    <div class="guest-banner" id="guest-banner" style="display:none;">You're browsing as a guest — your progress won't be saved. Open this app from Telegram to save your data.</div>
+
+  </section>
+
+
+  <section id="screen-refer" class="screen">
+    <div class="refer-header">
+      <div class="refer-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M12 8c-1.5-3-5-4-6-2s1 3 6 2zM12 8c1.5-3 5-4 6-2s-1 3-6 2z"></path></svg></div>
+      <div class="refer-title">Invite & Earn</div>
+      <div class="refer-subtitle" id="refer-subtitle">Share your link and start earning commission!</div>
+    </div>
+    <div class="refer-stats">
+      <div class="refer-stat"><div class="refer-stat-value" id="refer-count">0</div><div class="refer-stat-label">Total Referrals</div></div>
+      <div class="refer-stat"><div class="refer-stat-value" id="refer-earnings">$0.00</div><div class="refer-stat-label">Total Earnings</div></div>
+      <div class="refer-stat"><div class="refer-stat-value" id="refer-commission" style="font-size:14px;">5% / 10%</div><div class="refer-stat-label">Commission (Normal/Active)</div></div>
+      <div class="refer-stat"><div class="refer-stat-value" id="refer-active-count">0</div><div class="refer-stat-label">Active Referrals</div></div>
+    </div>
+    <div class="referral-link-card">
+      <div class="referral-link-label">Your Referral Link</div>
+      <div class="referral-link-box">
+        <input type="text" id="referral-link" readonly value="https://t.me/atrenvaBot?start=ref_" class="referral-link-input">
+        <button class="copy-btn" onclick="copyReferralLink()"><span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span></button>
+      </div>
+      <div class="referral-code">Code: <strong id="referral-code">--</strong></div>
+    </div>
+    <div class="referral-link-card" id="joined-by-card" style="display:none;">
+      <div class="referral-link-label">Joined Via</div>
+      <div class="referral-code" id="joined-by-text">--</div>
+    </div>
+    <div class="share-buttons">
+      <button class="share-btn share-telegram" onclick="shareOnTelegram()"><span><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21.5 2.5l-19 7.5 6 2.3 2.3 7.2 3.4-4.3 5.6 4.1z"></path></svg></span> Share on Telegram</button>
+      <button class="share-btn share-copy" onclick="copyReferralLink()"><span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span> Copy Link</button>
+    </div>
+    <div class="section-title">Your Referrals</div>
+    <div class="referrals-list" id="referrals-list"></div>
+
+  </section>
+
+
+  <section id="screen-work" class="screen">
+    <div class="work-header">
+      <div class="work-title">Investment</div>
+      <div class="work-subtitle">Invest with top traders and earn from their gains</div>
+    </div>
+    <div class="work-categories" id="work-categories">
+      <button class="work-cat-btn active" data-cat="all" onclick="filterWork('all')">All Plans</button>
+      <button class="work-cat-btn" data-cat="mine" onclick="filterWork('mine')">My Investments</button>
+      <button class="work-cat-btn" data-cat="free" onclick="filterWork('free')">Free</button>
+      <button class="work-cat-btn" data-cat="7day" onclick="filterWork('7day')">7 Day</button>
+      <button class="work-cat-btn" data-cat="30day" onclick="filterWork('30day')">30 Day</button>
+    </div>
+    <div class="work-items" id="work-items"></div>
+  </section>
+
+
+  <section id="screen-work-detail" class="screen">
+    <div class="work-detail-header"><button class="back-btn" onclick="navigateTo('work')"><span>←</span> Back</button></div>
+    <div class="work-detail-content" id="work-detail-content"></div>
+  </section>
+
+
+  <section id="screen-investment-progress" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeInvestmentProgress()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></span> Investment Progress</div></div>
+    <div class="work-detail-content" id="investment-progress-content"></div>
+  </section>
+
+
+  <section id="screen-transaction" class="screen">
+    <div class="transaction-header">
+      <div class="transaction-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"></rect><path d="M2 10h20M17 15h.01"></path></svg></span> Transactions</div>
+      <div class="transaction-balance" id="trans-balance">0.00</div>
+    </div>
+    <div class="transaction-tabs">
+      <button class="trans-tab active" data-tab="all" onclick="switchTransTab('all')">All</button>
+      <button class="trans-tab" data-tab="deposit" onclick="switchTransTab('deposit')">Deposit</button>
+      <button class="trans-tab" data-tab="withdraw" onclick="switchTransTab('withdraw')">Withdraw</button>
+      <button class="trans-tab" data-tab="earn" onclick="switchTransTab('earn')">Others</button>
+    </div>
+    <div class="transaction-actions">
+      <button class="trans-action-btn btn-deposit-lg" onclick="openDeposit()"><span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span> Deposit</button>
+      <button class="trans-action-btn btn-withdraw-lg" onclick="openWithdraw()"><span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></span> Withdraw</button>
+    </div>
+    <div class="transaction-list" id="transaction-list"></div>
+  </section>
+
+
+  <section id="screen-profile" class="screen">
+    <div class="profile-header">
+
+      <div class="profile-avatar" id="profile-avatar">
+        <div class="avatar-skeleton"></div>
+        <img src="" alt="Profile" id="profile-avatar-img">
+        <div class="profile-avatar-fallback" id="profile-avatar-fallback"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg></div>
+      </div>
+      <div class="profile-name" id="profile-name">Guest User</div>
+      <div class="profile-username-row">
+        <div class="profile-username" id="profile-username">@username</div>
+        <span class="plan-badge-icon hidden" id="profile-username-badge"></span>
+      </div>
+      <div class="profile-uid">UID: <span id="profile-uid">--</span></div>
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat"><div class="profile-stat-value" id="profile-streak">0</div><div class="profile-stat-label">Total Streak</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="profile-total-deposit">0.00</div><div class="profile-stat-label">Total Deposit</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="profile-total-withdraw">0.00</div><div class="profile-stat-label">Total Withdraw</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="profile-refs">0</div><div class="profile-stat-label">Total Refer</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="profile-balance">0.00</div><div class="profile-stat-label">Total Balance</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="profile-earnings">0.00</div><div class="profile-stat-label">Total Earning</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="profile-total-watchad">0</div><div class="profile-stat-label">Total Watch Ad</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="profile-active-refer">0</div><div class="profile-stat-label">Active Refer</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="profile-total-ad-campaign">0</div><div class="profile-stat-label">Total Ad Campaign</div></div>
+
+    </div>
+    <div class="profile-plan-card">
+      <div class="profile-plan-header">
+        <div><div class="profile-plan-title"><span class="plan-icon" id="profile-plan-icon"></span> Current Plan</div><div class="profile-plan-name" id="profile-plan-name">FREE</div></div>
+        <span class="profile-plan-badge" id="profile-plan-badge">Active</span>
+      </div>
+      <div class="profile-plan-detail"><span>Expires: <strong id="profile-plan-expire">--</strong></span></div>
+      <div class="plan-features-mini" id="profile-plan-features"></div>
+      <button class="profile-plan-btn" onclick="openPlans()">Upgrade Plan</button>
+    </div>
+    <div class="guest-banner" id="guest-banner-profile" style="display:none;">You're browsing as a guest — data isn't saved. Open from Telegram to keep your progress.</div>
+    <div class="profile-menu">
+      <div class="profile-menu-item" onclick="openAdCampaign()"><span class="profile-menu-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"></path><path d="M7 14v5a2 2 0 0 0 2 2h1v-6"></path></svg></span><span class="profile-menu-label">Ad Campaign</span><span class="profile-menu-arrow">→</span></div>
+      <div class="profile-menu-item" onclick="openTelegramChannel()"><span class="profile-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M21.5 2.5l-19 7.5 6 2.3 2.3 7.2 3.4-4.3 5.6 4.1z"></path></svg></span><span class="profile-menu-label">Telegram Channel</span><span class="profile-menu-arrow">→</span></div>
+      <div class="profile-menu-item" onclick="openDeveloper()"><span class="profile-menu-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></span><span class="profile-menu-label">Developer</span><span class="profile-menu-arrow">→</span></div>
+      <div class="profile-menu-item" onclick="openSupport()"><span class="profile-menu-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"></path><path d="M21 15a2 2 0 0 1-2 2h-1v-5h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-5H5a2 2 0 0 0-2 2z"></path></svg></span><span class="profile-menu-label">Support</span><span class="profile-menu-arrow">→</span></div>
+    </div>
+  </section>
+
+
+  <section id="screen-plans" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"></path><path d="M2 9h20M9 3l3 6-3 12M15 3l-3 6 3 12"></path></svg></span> Choose Plan</div></div>
+    <div class="plans-container" id="plans-container"></div>
+  </section>
+
+
+  <section id="screen-deposit" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title">Deposit</div></div>
+    <div class="deposit-content">
+      <div class="deposit-label" style="margin-top:0;">Payment Method</div>
+      <div class="deposit-methods" id="deposit-methods"></div>
+
+      <div class="withdraw-address-section" id="deposit-method-details" style="display:none;">
+        <label class="withdraw-label" id="deposit-method-detail-label">Send payment to</label>
+        <div class="address-copy-row">
+          <div class="method-detail-box" id="deposit-method-detail-value"></div>
+          <button class="address-copy-btn" onclick="copyDepositAddress()" title="Copy address"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+        </div>
+        <div class="method-limit-text" id="deposit-limit-text"></div>
+        <div class="method-note-text" id="deposit-method-note" style="display:none;"></div>
+        <div class="method-qr-box" id="deposit-method-qr" style="display:none;"></div>
+      </div>
+
+      <div class="deposit-amount-section" id="deposit-amount-section" style="display:none;">
+        <label class="deposit-label" style="margin-top:20px;">Amount (AENVA)</label>
+        <input type="number" id="deposit-amount" class="deposit-input" placeholder="0.00" min="1" step="0.01" oninput="onDepositAmountChange()">
+        <div class="field-error-text" id="deposit-amount-error"></div>
+        <div class="quick-amounts">
+          <button onclick="setAmount('deposit-amount',10)">10 AENVA</button>
+          <button onclick="setAmount('deposit-amount',25)">25 AENVA</button>
+          <button onclick="setAmount('deposit-amount',50)">50 AENVA</button>
+          <button onclick="setAmount('deposit-amount',100)">100 AENVA</button>
+        </div>
+        <div class="method-note-text" id="deposit-usd-breakdown" style="display:none; margin-top:10px;"></div>
+
+        <label class="deposit-label" style="margin-top:16px;">Coupon Code (optional)</label>
+        <div class="coupon-row">
+          <input type="text" id="deposit-coupon" class="coupon-input" placeholder="Enter coupon code">
+          <button class="coupon-apply-btn" id="deposit-coupon-btn" onclick="applyDepositCoupon()">Apply</button>
+        </div>
+        <div class="field-error-text" id="deposit-coupon-error"></div>
+        <div class="coupon-result" id="deposit-coupon-result" style="display:none;"></div>
+      </div>
+
+      <div class="withdraw-address-section" id="deposit-txid-section" style="display:none;">
+        <label class="withdraw-label">Transaction ID / Proof <span style="color:var(--coral)">*</span></label>
+        <input type="text" id="deposit-txid" class="withdraw-input" placeholder="Enter your transaction / UTR ID as proof">
+        <div class="field-error-text" id="deposit-txid-error"></div>
+      </div>
+
+      <button class="deposit-submit-btn" id="deposit-submit-btn" onclick="submitDeposit()" disabled>Confirm Deposit</button>
+    </div>
+  </section>
+
+
+  <section id="screen-withdraw" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title">Withdraw</div></div>
+    <div class="withdraw-content">
+      <div class="withdraw-balance-info"><span>Available:</span><strong id="withdraw-available">0.00 AENVA</strong></div>
+
+      <div class="withdraw-label">Withdrawal Method</div>
+      <div class="withdraw-methods" id="withdraw-methods"></div>
+
+      <div class="withdraw-amount-section">
+        <label class="withdraw-label" style="margin-top:18px;">Amount (AENVA)</label>
+        <input type="number" id="withdraw-amount" class="withdraw-input" placeholder="0.00" min="1" step="0.01" oninput="onWithdrawAmountChange()">
+        <div class="method-limit-text" id="withdraw-limit-text"></div>
+        <div class="method-note-text" id="withdraw-method-note" style="display:none;"></div>
+        <div class="field-error-text" id="withdraw-amount-error"></div>
+        <div class="field-success-text" id="withdraw-amount-success"></div>
+        <div class="method-note-text" id="withdraw-fee-breakdown" style="display:none; margin-top:10px;"></div>
+      </div>
+
+      <div class="withdraw-coupon-section">
+        <label class="withdraw-label">Coupon Code (optional)</label>
+        <div class="coupon-row">
+          <input type="text" id="withdraw-coupon" class="coupon-input" placeholder="Enter coupon code">
+          <button class="coupon-apply-btn" id="withdraw-coupon-btn" onclick="applyWithdrawCoupon()">Apply</button>
+        </div>
+        <div class="field-error-text" id="withdraw-coupon-error"></div>
+        <div class="coupon-result" id="withdraw-coupon-result" style="display:none;"></div>
+      </div>
+
+      <div class="withdraw-address-section">
+        <label class="withdraw-label">Wallet/Account Address</label>
+        <input type="text" id="withdraw-address" class="withdraw-input" placeholder="Enter your wallet address" oninput="onWithdrawAmountChange()">
+      </div>
+
+      <button class="withdraw-submit-btn" id="withdraw-submit-btn" onclick="submitWithdraw()" disabled>Done</button>
+    </div>
+  </section>
+
+
+  <section id="screen-stonehunt" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"></path><path d="M11 3l-3 6 4 13 4-13-3-6"></path><path d="M2 9h20"></path></svg></span> Stone Hunt</div></div>
+    <div class="stonehunt-content" id="stonehunt-content-wrap">
+
+      <div class="gmail-limit-card">
+        <div class="gmail-limit-top">
+          <div class="gmail-limit-left"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>Daily Limit</div>
+          <div class="gmail-limit-count" id="stonehunt-limit-count">0/5</div>
+        </div>
+        <div class="gmail-limit-bar-track"><div class="gmail-limit-bar-fill" id="stonehunt-limit-bar"></div></div>
+        <div class="gmail-limit-reset" id="stonehunt-limit-reset">Resets in --:--:--</div>
+      </div>
+
+      <div class="stonehunt-dash-card">
+        <div class="cave-stage-wrap" id="stonehunt-circle">
+          <div class="cave-scene">
+            <div class="cave-wall"></div>
+            <div class="cave-floor"></div>
+            <div class="cave-floor-edge"></div>
+            <div class="cave-ambient-glow"></div>
+            <div class="cave-dust" id="cave-dust"></div>
+            <div class="cave-torch left"><div class="cave-torch-stick"></div><div class="cave-torch-flame"></div></div>
+            <div class="cave-torch-light left"></div>
+            <div class="cave-torch left" style="left:auto;right:2%;"><div class="cave-torch-stick"></div><div class="cave-torch-flame"></div></div>
+            <div class="cave-torch-light left" style="left:auto;right:-10%;"></div>
+
+            <div class="cave-stones" id="cave-stones"></div>
+            <div class="cave-skeleton" id="cave-skeleton"></div>
+
+            <div class="cave-miner" id="cave-miner">
+              <svg viewBox="0 0 96 150" overflow="visible">
+                <ellipse class="cave-miner-shadow" cx="48" cy="146" rx="26" ry="6" fill="rgba(0,0,0,.45)"/>
+
+                <!-- back leg (pivots at hip y=96) -->
+                <g class="cave-leg cave-leg-back" style="transform-origin:39px 96px;">
+                  <rect x="34" y="96" width="10" height="30" rx="4" fill="#2c211a"/>
+                  <rect x="32" y="124" width="14" height="8" rx="2" fill="#120d09"/>
+                </g>
+
+                <!-- torso group (bobs while walking, tilts while swinging) -->
+                <g class="cave-torso">
+                  <rect x="28" y="58" width="40" height="42" rx="10" fill="#8a5a2f"/>
+                  <rect x="28" y="58" width="40" height="14" rx="7" fill="#6b431f"/>
+                  <rect x="28" y="88" width="40" height="7" fill="#3a2515"/>
+                  <rect x="30" y="64" width="6" height="30" rx="3" fill="#734a27" opacity=".5"/>
+
+                  <!-- back arm (subtle counter-swing) -->
+                  <g class="cave-arm cave-arm-back" style="transform-origin:34px 64px;">
+                    <rect x="30" y="62" width="9" height="24" rx="4" fill="#6b431f"/>
+                  </g>
+
+                  <!-- head -->
+                  <g class="cave-head">
+                    <circle cx="48" cy="38" r="18" fill="#e8b98a"/>
+                    <path d="M28 34 a20 20 0 0 1 40 0 v2 h-40 z" fill="#c98a2e"/>
+                    <rect x="26" y="34" width="44" height="6" rx="3" fill="#a86f22"/>
+                    <circle cx="48" cy="22" r="5" fill="#ffe9a8" stroke="#d9a441" stroke-width="1.5" class="cave-helmet-light"/>
+                  </g>
+
+                  <!-- front arm + pickaxe (main swing arm, pivots at shoulder) -->
+                  <g class="cave-arm cave-arm-front" style="transform-origin:63px 64px;">
+                    <rect x="59" y="62" width="10" height="26" rx="5" fill="#7a4e28"/>
+                    <g class="cave-pick" style="transform-origin:64px 68px;">
+                      <rect x="58" y="34" width="8" height="40" rx="3" fill="#5b3a20"/>
+                      <path d="M40 24 L86 18 L84 28 L40 36 Z" fill="#b9c1c8"/>
+                      <path d="M40 24 L36 16 L84 18 L86 18 Z" fill="#8d959c"/>
+                      <path d="M84 18 L86 18 L84 28 Z" fill="#eef1f3" opacity=".7"/>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- front leg (pivots at hip y=96) -->
+                <g class="cave-leg cave-leg-front" style="transform-origin:57px 96px;">
+                  <rect x="52" y="96" width="10" height="30" rx="4" fill="#3a2c22"/>
+                  <rect x="50" y="124" width="14" height="8" rx="2" fill="#1a130d"/>
+                </g>
+              </svg>
+            </div>
+
+            <div class="cave-vignette"></div>
+            <div class="cave-depth-layer"></div>
+            <div class="cave-floor-shadow"></div>
+          </div>
+        </div>
+
+        <div class="stonehunt-progress-wrap">
+          <div class="stonehunt-progress-track"><div class="stonehunt-progress-bar" id="stonehunt-progress-bar"></div></div>
+          <div class="stonehunt-progress-labels"><span id="stonehunt-progress-pct">0%</span><span id="stonehunt-remaining-value">--:--:--</span></div>
+        </div>
+
+        <div class="stonehunt-quickstats">
+          <div class="stonehunt-quickstat"><div class="stonehunt-quickstat-label">Speed</div><div class="stonehunt-quickstat-value" id="stonehunt-speed-value">1.00×</div></div>
+        </div>
+
+        <button class="stonehunt-boost-btn" id="stonehunt-start-btn" onclick="startStoneHunt()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg> Start Stone Hunt</button>
+        <div class="stonehunt-limit-msg hidden" id="stonehunt-limit-msg">Daily Stone Hunt limit reached. Come back tomorrow.</div>
+      </div>
+
+      <div class="stonehunt-section-card">
+        <div class="stonehunt-section-title-row">
+          <div class="stonehunt-section-title">Boost</div>
+          <button class="stonehunt-boost-toggle-btn" id="stonehunt-boost-toggle-btn" onclick="toggleStoneHuntBoostPanel()">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-8z"></path></svg>
+            Boost
+          </button>
+        </div>
+        <div id="stonehunt-boost-card" class="stonehunt-boost-panel hidden"></div>
+      </div>
+
+      <div class="stonehunt-section-card">
+        <div class="stonehunt-section-title">Stone Hunt History</div>
+        <div id="stonehunt-history-list"></div>
+      </div>
+
+    </div>
+
+    <div class="stonehunt-activity-modal hidden" id="stonehunt-activity-modal">
+      <div class="stonehunt-activity-modal-box">
+        <div class="stonehunt-activity-icon"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9z"></path><path d="M11 3l-3 6 4 13 4-13-3-6"></path><path d="M2 9h20"></path></svg></div>
+        <div class="stonehunt-activity-title">Stone Hunt Paused</div>
+        <div class="stonehunt-activity-desc">Activity check required to continue Stone Hunt.</div>
+        <button class="stonehunt-boost-btn" id="stonehunt-activity-check-btn" onclick="stoneHuntActivityCheckNow()">CHECK NOW</button>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="screen-mining" class="screen overlay-screen">
+    <div class="overlay-header overlay-header-split">
+      <div class="overlay-header-left">
+        <button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button>
+        <div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-2 8H6z"></path><path d="M4 8V5h16v3"></path><circle cx="8" cy="19" r="1.5"></circle><circle cx="16" cy="19" r="1.5"></circle></svg></span> Mining</div>
+      </div>
+      <button class="mining-upgrade-btn" onclick="openMiningModels()">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-8z"></path></svg>
+        Upgrade Model
+      </button>
+    </div>
+
+    <div class="mining-fullscreen-wrap">
+      <div class="mining-stage" id="mining-action-area"></div>
+    </div>
+  </section>
+
+
+  <section id="screen-mining-models" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-2 8H6z"></path><path d="M4 8V5h16v3"></path><circle cx="8" cy="19" r="1.5"></circle><circle cx="16" cy="19" r="1.5"></circle></svg></span> Models</div></div>
+
+    <div class="section-title">Choose Your Model</div>
+    <div class="mining-uncle-grid" id="mining-uncle-grid"></div>
+  </section>
+
+
+  <section id="screen-task" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title">Tasks</div></div>
+    <div class="gmail-limit-card" style="margin:16px 20px 0;">
+      <div class="gmail-limit-top">
+        <div class="gmail-limit-left"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>Daily Limit</div>
+        <div class="gmail-limit-count" id="task-limit-count">0/5</div>
+      </div>
+      <div class="gmail-limit-bar-track"><div class="gmail-limit-bar-fill" id="task-limit-bar"></div></div>
+      <div class="gmail-limit-reset" id="task-limit-reset">Resets in --:--:--</div>
+    </div>
+    <div class="task-scroll-row" id="task-items"></div>
+
+  </section>
+
+
+  <section id="screen-gmail" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title">Gmail</div></div>
+    <div class="social-content">
+
+      <div class="social-tabs">
+        <button class="social-tab-btn active" data-gmailtab="sell" onclick="switchGmailTab('sell')">Sell</button>
+        <button class="social-tab-btn" data-gmailtab="buy" onclick="switchGmailTab('buy')">Buy</button>
+      </div>
+
+
+      <div id="gmail-tab-sell" class="social-tab-panel active">
+
+      <div class="gmail-limit-card">
+        <div class="gmail-limit-top">
+          <div class="gmail-limit-left"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M22 6l-10 7L2 6"></path></svg></span>Daily Limit</div>
+          <div class="gmail-limit-count" id="gmail-limit-count">0/5</div>
+        </div>
+        <div class="gmail-limit-bar-track"><div class="gmail-limit-bar-fill" id="gmail-limit-bar"></div></div>
+        <div class="gmail-limit-reset" id="gmail-limit-reset">Resets in --:--:--</div>
+      </div>
+
+      <div class="social-note" id="gmail-note">
+        <span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+        <span id="gmail-note-text">Generate a Gmail account below and submit it for review. Once accepted, your reward is added straight to your Earning Balance. If rejected, it's logged as invalid work.</span>
+      </div>
+
+
+      <!-- ===== New Gmail Step 1 (identity: First Name / Last Name / Birth Year) added on top of existing system ===== -->
+      <div class="social-form-card" id="gmail-step-1">
+        <label class="withdraw-label">First Name</label>
+        <div class="copy-text-field" id="gmail-identity-fname" onclick="copyGmailIdentityField('gmail-identity-fname')">—</div>
+
+        <label class="withdraw-label" style="margin-top:14px;">Last Name</label>
+        <div class="copy-text-field" id="gmail-identity-lname" onclick="copyGmailIdentityField('gmail-identity-lname')">—</div>
+
+        <label class="withdraw-label" style="margin-top:14px;">Birth Year</label>
+        <div class="copy-text-field" id="gmail-identity-year" onclick="copyGmailIdentityField('gmail-identity-year')">—</div>
+
+        <button class="social-submit-btn" id="gmail-next-btn" onclick="goToGmailStep2()">Next</button>
+      </div>
+      <!-- ===== END Gmail Step 1 ===== -->
+
+      <div class="social-form-card" id="gmail-step-2" style="display:none;">
+        <label class="withdraw-label">Gmail Address</label>
+        <div class="pass-input-wrap">
+          <input type="text" id="gmail-generated-id" class="withdraw-input mono" value="" readonly placeholder="Tap Refresh to generate">
+          <button type="button" class="pass-toggle-btn" onclick="copyGmailField('gmail-generated-id')">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+
+        <label class="withdraw-label" style="margin-top:16px;">Password</label>
+        <div class="pass-input-wrap">
+          <input type="text" id="gmail-generated-password" class="withdraw-input mono" value="" readonly>
+          <button type="button" class="pass-toggle-btn" onclick="copyGmailField('gmail-generated-password')">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+
+        <div class="gmail-btn-row">
+          <button class="social-submit-btn gmail-refresh-btn" id="gmail-back-btn" onclick="goToGmailStep1()">Back</button>
+          <button class="social-submit-btn gmail-refresh-btn" id="gmail-cancel-btn" onclick="cancelGmailFlow()">Cancel</button>
+          <button class="social-submit-btn" id="gmail-done-btn" onclick="submitGmailId()">Done</button>
+        </div>
+      </div>
+
+      <div class="section-title">History</div>
+      <div class="social-history-list" id="gmail-history-list"></div>
+
+      </div>
+
+      <div id="gmail-tab-buy" class="social-tab-panel">
+        <div class="social-history-list" id="gmail-buy-list"></div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <div class="proof-modal-overlay" id="social-buy-modal-overlay">
+    <div class="proof-modal-sheet" id="social-buy-modal-sheet">
+      <div class="proof-modal-title" id="social-buy-modal-title">Buy Account</div>
+      <div class="proof-modal-desc" id="social-buy-modal-desc"></div>
+      <div class="proof-modal-actions">
+        <button class="proof-cancel-btn" onclick="closeSocialBuyModal()">Cancel</button>
+        <button class="proof-send-btn" id="social-buy-confirm-btn" onclick="confirmSocialBuy()">Buy</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="proof-modal-overlay" id="social-buy-success-overlay">
+    <div class="proof-modal-sheet">
+      <div class="proof-modal-title">Purchase Successful</div>
+      <div class="proof-modal-desc">Here are your login details — save them now, they won't be shown again here.</div>
+      <div class="social-form-card" style="margin-top:10px;">
+        <label class="withdraw-label">UID</label>
+        <div class="pass-input-wrap">
+          <input type="text" id="social-buy-success-id" class="withdraw-input mono" readonly>
+          <button type="button" class="pass-toggle-btn" onclick="copyGmailField('social-buy-success-id')">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+        <label class="withdraw-label" style="margin-top:16px;">Password</label>
+        <div class="pass-input-wrap">
+          <input type="text" id="social-buy-success-password" class="withdraw-input mono" readonly>
+          <button type="button" class="pass-toggle-btn" onclick="copyGmailField('social-buy-success-password')">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+        <label class="withdraw-label" style="margin-top:16px;">Cookies</label>
+        <div class="pass-input-wrap">
+          <input type="text" id="social-buy-success-cookies" class="withdraw-input mono social-cookie-masked" readonly>
+          <button type="button" class="pass-toggle-btn" onclick="copyGmailField('social-buy-success-cookies')" aria-label="Copy masked cookies">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+        </div>
+      </div>
+      <div class="proof-modal-actions">
+        <button class="proof-send-btn" style="width:100%;" onclick="closeSocialBuySuccess()">Close</button>
+      </div>
+    </div>
+  </div>
+
+
+  <section id="screen-facebook" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title">Facebook</div></div>
+    <div class="social-content">
+
+      <div class="social-tabs">
+        <button class="social-tab-btn active" data-fbtab="sell" onclick="switchFacebookTab('sell')">Sell</button>
+        <button class="social-tab-btn" data-fbtab="buy" onclick="switchFacebookTab('buy')">Buy</button>
+      </div>
+
+      <div id="fb-tab-sell" class="social-tab-panel active">
+
+      <div class="gmail-limit-card">
+        <div class="gmail-limit-top">
+          <div class="gmail-limit-left"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>Daily Limit</div>
+          <div class="gmail-limit-count" id="facebook-limit-count">0/5</div>
+        </div>
+        <div class="gmail-limit-bar-track"><div class="gmail-limit-bar-fill" id="facebook-limit-bar"></div></div>
+        <div class="gmail-limit-reset" id="facebook-limit-reset">Resets in --:--:--</div>
+      </div>
+
+      <div class="social-note" id="fb-note">
+        <span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+        <span id="fb-note-text">Submit your Facebook account UID and cookies below. Our team will review it — once accepted, your reward is added straight to your Earning Balance. If rejected, it's logged as invalid work.</span>
+      </div>
+      
+
+      <div class="social-form-card" id="fb-step-1">
+        <label class="withdraw-label">First Name</label>
+        <div class="copy-text-field" id="fb-identity-fname" onclick="copyFacebookIdentityField('fb-identity-fname')">—</div>
+
+        <label class="withdraw-label" style="margin-top:14px;">Last Name</label>
+        <div class="copy-text-field" id="fb-identity-lname" onclick="copyFacebookIdentityField('fb-identity-lname')">—</div>
+
+        <label class="withdraw-label" style="margin-top:14px;">Password</label>
+        <div class="copy-text-field" id="fb-identity-password" onclick="copyFacebookIdentityField('fb-identity-password')">—</div>
+
+        <button class="social-submit-btn" id="fb-next-btn" onclick="goToFacebookStep2()">Next</button>
+      </div>
+
+      <div class="social-form-card" id="fb-step-2" style="display:none;">
+        <label class="withdraw-label">Facebook UID</label>
+        <input type="text" id="fb-task-uid" class="withdraw-input" placeholder="Enter Facebook account UID">
+        <div class="field-error-text" id="fb-task-uid-error"></div>
+
+        <label class="withdraw-label" style="margin-top:16px;">Facebook Cookies</label>
+        <textarea id="fb-task-cookies" class="withdraw-input" rows="4" placeholder="Paste your Facebook account cookies here" style="resize:vertical; font-family:inherit;"></textarea>
+        <div class="field-error-text" id="fb-task-cookies-error"></div>
+
+        <div class="gmail-btn-row">
+          <button class="social-submit-btn gmail-refresh-btn" id="fb-back-btn" onclick="goToFacebookStep1()">Back</button>
+          <button class="social-submit-btn gmail-refresh-btn" id="fb-cancel-btn" onclick="cancelFacebookFlow()">Cancel</button>
+          <button class="social-submit-btn" id="fb-submit-btn" onclick="submitFacebookRequest()">Submit Request</button>
+        </div>
+      </div>
+
+      <div class="section-title">My Submissions</div>
+      <div class="social-history-list" id="fb-history-list"></div>
+
+      </div>
+
+      <div id="fb-tab-buy" class="social-tab-panel">
+        <div class="social-history-list" id="fb-buy-list"></div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <section id="screen-ad" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"></path><path d="M7 14v5a2 2 0 0 0 2 2h1v-6"></path></svg></span> Ad Campaign</div></div>
+    <div class="ad-content">
+      <div class="ad-balance"><span>Deposit Balance:</span><strong id="ad-balance">$0.00</strong></div>
+
+      <div class="ad-create-card">
+        <div class="ad-create-title">Request a New Campaign</div>
+        <div class="ad-form">
+          <label>Campaign Name</label>
+          <input type="text" id="ad-name" placeholder="My Campaign">
+
+          <label>Target</label>
+          <select id="ad-target">
+            <option value="task">Task</option>
+            <option value="event">Event</option>
+            <option value="ad">Ad</option>
+          </select>
+
+          <label>Action / Direct Link</label>
+          <input type="url" id="ad-link" placeholder="https://example.com">
+
+          <label>Ad Image Link</label>
+          <input type="url" id="ad-image-link" placeholder="https://example.com/image.jpg">
+
+          <label>Campaign Duration (days)</label>
+          <input type="number" id="ad-days" placeholder="7" min="1" step="1">
+
+          <label>Amount You Want to Pay</label>
+          <input type="number" id="ad-amount" placeholder="10.00" min="1" step="0.01">
+
+          <button class="ad-create-btn" id="ad-request-btn" onclick="submitAdCampaignRequest()">Send Request</button>
+        </div>
+      </div>
+
+      <div class="section-title">My Campaigns</div>
+      <div class="ad-campaigns-list" id="ad-campaigns-list"></div>
+    </div>
+  </section>
+
+
+  <section id="screen-notifications" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></span> Notifications</div></div>
+    <div class="notifications-list" id="notifications-list"></div>
+  </section>
+
+
+  <section id="screen-exchange" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg></span> Exchange</div></div>
+    <div class="exchange-content" id="exchange-content">
+
+      <div id="exchange-mode-deposit-wrap">
+        <div class="exchange-rate-card">
+          <div class="exchange-rate-label">Your Exchange Rate</div>
+          <div class="exchange-rate-value" id="exchange-rate-value">0%</div>
+          <div class="exchange-rate-plan" id="exchange-rate-plan">Free Plan</div>
+        </div>
+
+        <div class="exchange-locked-note" id="exchange-locked-note" style="display:none;">
+          <span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+          Free plan users can't exchange. Upgrade your plan to unlock Deposit → Earning exchange.
+          <button class="exchange-upgrade-btn" onclick="closeOverlay(); openPlans();">Upgrade Plan →</button>
+        </div>
+
+        <div class="exchange-form-card" id="exchange-form-card">
+          <div class="exchange-balance-row">
+            <span>Available Deposit Balance:</span>
+            <strong id="exchange-available-deposit">0.00</strong>
+          </div>
+
+          <label class="withdraw-label">Deposit Balance to Exchange</label>
+          <input type="number" id="exchange-from-amount" class="withdraw-input" placeholder="0.00" min="0" step="0.01" oninput="onExchangeAmountChange()">
+          <div class="field-error-text" id="exchange-amount-error"></div>
+
+          <label class="withdraw-label" style="margin-top:16px;">You Will Receive (Earning Balance)</label>
+          <input type="text" id="exchange-to-amount" class="withdraw-input" value="$0.00" readonly>
+
+          <button class="exchange-submit-btn" id="exchange-submit-btn" onclick="submitExchange()" disabled>Exchange</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <section id="screen-events" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span> Events</div></div>
+    <div class="events-list" id="events-list"></div>
+  </section>
+
+
+  <section id="screen-gift" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M12 8c-1.5-3-5-4-6-2s1 3 6 2zM12 8c1.5-3 5-4 6-2s-1 3-6 2z"></path></svg></span> Gift</div></div>
+    <div class="gift-content">
+      <div class="gift-hero">
+        <div class="gift-hero-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M12 8c-1.5-3-5-4-6-2s1 3 6 2zM12 8c1.5-3 5-4 6-2s-1 3-6 2z"></path></svg></div>
+        <div class="gift-hero-title">Redeem Gift Code</div>
+        <div class="gift-hero-desc">Enter a gift code below to check your reward, then claim it.</div>
+      </div>
+
+      <div class="gift-form-card">
+        <label class="withdraw-label">Gift Code</label>
+        <div class="coupon-row">
+          <input type="text" id="gift-code" class="coupon-input" placeholder="Enter gift code" oninput="onGiftCodeChange()">
+          <button class="coupon-apply-btn" id="gift-apply-btn" onclick="applyGiftCode()">Apply</button>
+        </div>
+        <div class="field-error-text" id="gift-code-error"></div>
+        <div class="coupon-result" id="gift-code-result" style="display:none;"></div>
+
+        <button class="gift-claim-btn" id="gift-claim-btn" onclick="claimGiftCode()" disabled>Claim Reward</button>
+      </div>
+    </div>
+  </section>
+
+
+  <section id="screen-watchad" class="screen overlay-screen">
+    <div class="overlay-header"><button class="back-btn" onclick="closeOverlay()"><span>←</span> Back</button><div class="overlay-title"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg></span> Watch Ad</div></div>
+
+    <div class="watchad-content">
+
+      <div class="gmail-limit-card">
+        <div class="gmail-limit-top">
+          <div class="gmail-limit-left"><span class="icon-inline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>Available AENVA</div>
+          <div class="gmail-limit-count" id="watchad-available-atr">0.00</div>
+        </div>
+        <div class="gmail-limit-bar-track"><div class="gmail-limit-bar-fill" id="watchad-limit-bar"></div></div>
+        <div class="gmail-limit-reset" id="watchad-limit-reset">Resets in --:--:--</div>
+        <div style="display:none;" id="watchad-limit-count">0/20</div>
+      </div>
+
+      <div class="watchad-dash-card">
+        <div class="watchad-dash-icon">
+          <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg>
+        </div>
+        <div class="watchad-dash-title">Watch an ad and earn AENVA</div>
+        <div class="watchad-dash-reward" id="watchad-reward-amount">+0.00 AENVA per ad</div>
+
+        <button class="watchad-watch-btn" id="watchad-watch-btn" onclick="watchAdForCredit()">Watch Ad</button>
+        <div class="watchad-cooldown-text" id="watchad-cooldown-text" style="display:none;"></div>
+      </div>
+
+      <div class="section-title">History</div>
+      <div class="watchad-history-list" id="watchad-history-list"></div>
+
+    </div>
+  </section>
+
+
+</main>
+
+<div class="investment-ad-overlay" id="investment-ad-overlay">
+  <div class="investment-ad-box">
+    <iframe id="investment-ad-iframe" src="about:blank" frameborder="0" scrolling="yes"></iframe>
+    <div class="investment-ad-bar">
+      <div class="investment-ad-timer">Ad closes in <span id="investment-ad-countdown">15</span>s</div>
+      <button id="investment-ad-close-btn" class="investment-ad-close" disabled onclick="closeInvestmentAdIframe(true)">✕</button>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="nav-item active" data-screen="home" onclick="navigateTo('home')"><span class="nav-icon"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"></path></svg></span><span class="nav-label">Home</span></button>
+  <button class="nav-item" data-screen="refer" onclick="navigateTo('refer')"><span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span class="nav-label">Refer</span></button>
+  <button class="nav-item" data-screen="work" onclick="navigateTo('work')"><span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></span><span class="nav-label">Investment</span></button>
+  <button class="nav-item" data-screen="transaction" onclick="navigateTo('transaction')"><span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"></rect><path d="M2 10h20M17 15h.01"></path></svg></span><span class="nav-label">Trans</span></button>
+  <button class="nav-item" data-screen="profile" onclick="navigateTo('profile')"><span class="nav-icon"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg></span><span class="nav-label">Profile</span></button>
+</nav>
+
+
+<div class="proof-modal-overlay" id="proof-modal-overlay">
+  <div class="proof-modal-sheet">
+    <div class="proof-modal-title">Submit Proof</div>
+    <div class="proof-modal-desc" id="proof-modal-task-name">Select a screenshot from your gallery</div>
+    <label class="proof-picker-box" id="proof-picker-box" for="proof-file-input">
+      <div id="proof-picker-content">
+        <div class="proof-picker-hint">Tap to choose an image from your gallery</div>
+      </div>
+    </label>
+    <input type="file" id="proof-file-input" accept="image/*" style="display:none;" onchange="onProofFileSelected(event)">
+    <div class="proof-modal-actions">
+      <button class="proof-cancel-btn" onclick="closeProofModal()">Cancel</button>
+      <button class="proof-send-btn" id="proof-send-btn" onclick="sendProofSubmission()" disabled>Send</button>
+    </div>
+  </div>
+</div>
+
+
+
+<script type="module" src="app.js?v=20260902-1"></script>
+</body>
+</html>
